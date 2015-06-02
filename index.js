@@ -6,24 +6,23 @@ var debug = require('debug')('knead-stream')
 module.exports = KneadStream
 
 inherits(KneadStream, Transform)
-function KneadStream (merge) {
-  /*
-  transforms to:
-    {
-      tables: daff tables,
-      visual: the terminal visual for that daff
-    }
-  */
-  if (!(this instanceof KneadStream)) return new KneadStream(merge)
+function KneadStream (vizFn, merge) {
+  if (!(this instanceof KneadStream)) return new KneadStream(vizFn, merge)
   Transform.call(this, {objectMode: true})
+  debug('merge fn', merge)
   this.destroyed = false
+  this.diff2vis = vizFn || function (changes, cb) {
+    cb(changes, changes)
+  }
   this.merge = merge || this.cli
 }
 
 KneadStream.prototype._transform = function (data, enc, next) {
   var self = this
   debug('merge', data)
-  self.merge(data.tables, data.visual, self.push.bind(self), next)
+  self.diff2vis(data, function (tables, visual) {
+    self.merge(tables, visual, self.push.bind(self), next)
+  })
 }
 
 KneadStream.prototype.cli = function (tables, visual, push, next) {
