@@ -1,13 +1,13 @@
 var inherits = require('inherits')
 var Transform = require('stream').Transform
 var promptSync = require('prompt-sync')
-var debug = require('debug')('knead-stream')
+var debug = require('debug')('manual-merge-stream')
 
-module.exports = KneadStream
+module.exports = ManualMergeStream
 
-inherits(KneadStream, Transform)
-function KneadStream (vizFn, merge) {
-  if (!(this instanceof KneadStream)) return new KneadStream(vizFn, merge)
+inherits(ManualMergeStream, Transform)
+function ManualMergeStream (vizFn, merge) {
+  if (!(this instanceof ManualMergeStream)) return new ManualMergeStream(vizFn, merge)
   Transform.call(this, {objectMode: true})
   debug('merge fn', merge)
   this.destroyed = false
@@ -17,7 +17,7 @@ function KneadStream (vizFn, merge) {
   this.merge = merge || this.cli
 }
 
-KneadStream.prototype._transform = function (data, enc, next) {
+ManualMergeStream.prototype._transform = function (data, enc, next) {
   var self = this
   debug('merge', data)
   self.diff2vis(data, function (tables, visual) {
@@ -25,7 +25,7 @@ KneadStream.prototype._transform = function (data, enc, next) {
   })
 }
 
-KneadStream.prototype.cli = function (tables, visual, push, next) {
+ManualMergeStream.prototype.cli = function (tables, visual, push, next) {
   console.log(visual)
 
   var older = tables[0]
@@ -66,7 +66,7 @@ function help () {
   console.log('skip (s), yes (y), no (n), quit (q)')
 }
 
-KneadStream.prototype.destroy = function (err) {
+ManualMergeStream.prototype.destroy = function (err) {
   if (this.destroyed) return
   this.destroyed = true
   this.err = err
