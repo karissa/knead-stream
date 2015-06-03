@@ -2,6 +2,7 @@ var inherits = require('inherits')
 var Transform = require('stream').Transform
 var prompt = require('cli-prompt')
 var debug = require('debug')('manual-merge-stream')
+var diffs2string = require('diffs-to-string')
 
 module.exports = ManualMergeStream
 
@@ -12,7 +13,7 @@ function ManualMergeStream (vizFn, merge) {
   debug('merge fn', merge)
   this.destroyed = false
   this.diff2vis = vizFn || function (changes, cb) {
-    cb(changes, JSON.stringify(changes))
+    cb(changes, diffs2string(changes))
   }
   this.merge = merge || this.cli
 }
