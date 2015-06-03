@@ -1,14 +1,14 @@
 {
-  "name": "knead-stream",
+  "name": "manual-merge-stream",
   "version": "1.0.2",
-  "description": "use cli to merge a stream",
+  "description": "use user input to merge a sorted-diff-stream",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/karissa/knead-stream.git"
+    "url": "https://github.com/karissa/manual-merge-stream.git"
   },
   "keywords": [
     "merge",
@@ -18,9 +18,9 @@
   "author": "Karissa McKelvey <karissa@karissamck.com> (http://karissamck.com/)",
   "license": "BSD",
   "bugs": {
-    "url": "https://github.com/karissa/knead-stream/issues"
+    "url": "https://github.com/karissa/manual-merge-stream/issues"
   },
-  "homepage": "https://github.com/karissa/knead-stream",
+  "homepage": "https://github.com/karissa/manual-merge-stream",
   "dependencies": {
     "debug": "^2.2.0",
     "inherits": "^2.0.1",
