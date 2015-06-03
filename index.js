@@ -1,6 +1,6 @@
 var inherits = require('inherits')
 var Transform = require('stream').Transform
-var promptSync = require('prompt-sync')
+var prompt = require('cli-prompt')
 var debug = require('debug')('manual-merge-stream')
 
 module.exports = ManualMergeStream
@@ -12,7 +12,7 @@ function ManualMergeStream (vizFn, merge) {
   debug('merge fn', merge)
   this.destroyed = false
   this.diff2vis = vizFn || function (changes, cb) {
-    cb(changes, changes)
+    cb(changes, JSON.stringify(changes))
   }
   this.merge = merge || this.cli
 }
@@ -33,31 +33,32 @@ ManualMergeStream.prototype.cli = function (tables, visual, push, next) {
 
   function repl () {
     // TODO: change limit in repl (like git's add -p or e/edit)
-    process.stdout.write('Keep this chunk? [y,n,s,q,?] ')
-    var val = promptSync()
-    if (val === 's' || val === 'skip') {
-      return next()
-    }
-    if (val === 'y' || val === 'yes') {
-      for (var i = 0; i < newer.data.length; i++) {
-        debug('pushing', newer.data[i])
-        push(newer.data[i])
+    prompt('Keep this chunk? [y,n,s,q,?] ', function (val) {
+      debug('val', val)
+      if (val === 's' || val === 'skip') {
+        return next()
       }
-      return next()
-    }
-    if (val === 'n' || val === 'no') {
-      for (var i = 0; i < newer.data.length; i++) {
-        debug('pushing', older.data[i])
-        push(older.data[i])
+      if (val === 'y' || val === 'yes') {
+        for (var i = 0; i < newer.data.length; i++) {
+          debug('pushing', newer.data[i])
+          push(newer.data[i])
+        }
+        return next()
       }
-      return next()
-    }
-    if (val === 'q' || val === 'quit') {
-      process.exit()
-    } else {
-      help()
-      repl()
-    }
+      if (val === 'n' || val === 'no') {
+        for (var i = 0; i < newer.data.length; i++) {
+          debug('pushing', older.data[i])
+          push(older.data[i])
+        }
+        return next()
+      }
+      if (val === 'q' || val === 'quit') {
+        process.exit()
+      } else {
+        help()
+        repl()
+      }
+    })
   }
   repl()
 }

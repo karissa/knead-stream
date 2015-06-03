@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/karissa/manual-merge-stream",
   "dependencies": {
+    "cli-prompt": "^0.4.1",
     "debug": "^2.2.0",
-    "inherits": "^2.0.1",
-    "prompt-sync": "^1.0.0"
+    "inherits": "^2.0.1"
   }
 }
