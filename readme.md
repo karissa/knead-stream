@@ -6,7 +6,7 @@ Use the cli to merge a diff stream. See use in [knead](karissa/knead)
 
 You'll want to pass your diff stream through a batch function first, because otherwise the user might be overwhelmed with console output.
 
-```
+```js
 var Batcher = require('byte-stream')
 var manualMergeStream = require('manual-merge-stream')
 var diffs2string = require('diffs-to-string')
