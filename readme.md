@@ -49,17 +49,23 @@ Keep this chunk? [y/n/s/q/?]:
 
 At each page, the user is presented with a prompt and can enter one of the following choices:
 
-  `yes`: Will merge the right diff over the left diff.
+  `yes`: Will merge the right diff over the left diff
+
   `no`: Will ignore the right diff
+
   `skip`: Will skip this chunk and write neither
+
   `quit`: Will abort, not writing everything
+
   `?`: Will give more detailed instructions
 
 
 ### TODO
 Add options:
-  `ya`: yes to all
-  `ra`: right to all
-  `sr`: skip the rest
+  `yy`: yes the rest
+
+  `nn`: no to the rest
+
+  `ss`: skip the rest
 
 
