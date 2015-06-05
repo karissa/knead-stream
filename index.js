@@ -1,3 +1,5 @@
+var fs = require('fs')
+var path = require('path')
 var inherits = require('inherits')
 var Transform = require('stream').Transform
 var prompt = require('cli-prompt')
@@ -16,6 +18,7 @@ function ManualMergeStream (opts) {
     cb(changes, diffs2string(changes))
   }
   this.merge = opts.merge || this.cli
+  this.stickyBit = false
 }
 
 ManualMergeStream.prototype._transform = function (data, enc, next) {
@@ -27,45 +30,91 @@ ManualMergeStream.prototype._transform = function (data, enc, next) {
 }
 
 ManualMergeStream.prototype.cli = function (tables, visual, push, next) {
-  console.log(visual)
-
+  var self = this
   var older = tables[0]
   var newer = tables[1]
 
+  function pushRow (row) {
+    for (var i = 0; i < row.data.length; i++) {
+      debug('pushing', row.data[i])
+      push(row.data[i])
+    }
+  }
+
   function repl () {
-    // TODO: change limit in repl (like git's add -p or e/edit)
-    prompt('Keep this chunk? [y,n,s,q,?] ', function (val) {
-      debug('val', val)
-      if (val === 's' || val === 'skip') {
+    if (self.stickyBit) {
+      if (self.stickyBit === 'y') {
+        pushRow(newer)
         return next()
       }
-      if (val === 'y' || val === 'yes') {
-        for (var i = 0; i < newer.data.length; i++) {
-          debug('pushing', newer.data[i])
-          push(newer.data[i])
-        }
+      else {
+        pushRow(older)
         return next()
       }
-      if (val === 'n' || val === 'no') {
-        for (var i = 0; i < newer.data.length; i++) {
-          debug('pushing', older.data[i])
-          push(older.data[i])
-        }
-        return next()
-      }
-      if (val === 'q' || val === 'quit') {
-        process.exit()
-      } else {
-        help()
-        repl()
-      }
-    })
+    }
+    console.log(visual)
+    prompt('Keep this chunk? [y,n,s,q,?] ', getInput)
   }
   repl()
+
+  function getInput (val) {
+    debug('val', val)
+    if (val === 's' || val === 'skip') {
+      return next()
+    }
+
+    if (val === 'y' || val === 'yes') {
+      pushRow(newer)
+      return next()
+    }
+    if (val === 'n' || val === 'no') {
+      pushRow(older)
+      return next()
+    }
+
+    if (val === 'yy') {
+      return confirm('say y to the rest of the rows.', function (yes) {
+        if (yes) {
+          self.stickyBit = 'y'
+          repl()
+        }
+        else repl()
+      })
+    }
+
+    if (val === 'nn') {
+      return confirm('say n to the rest of the rows.', function (yes) {
+        if (yes) {
+          self.stickyBit = 'n'
+          repl()
+        }
+        else repl()
+      })
+    }
+
+    if (val === 'q' || val === 'quit') {
+      process.exit()
+    } else {
+      help()
+      repl()
+    }
+  }
+
+}
+
+function confirm (msg, cb) {
+  prompt('This will ' + msg + ' Are you sure? (y/n):', function (subval) {
+    if (subval === 'y') {
+      cb(true)
+    }
+    else {
+      cb(false)
+    }
+  })
 }
 
 function help () {
-  console.log('skip (s), yes (y), no (n), quit (q)')
+  console.log(fs.readFileSync(path.join(__dirname, 'usage.txt')).toString())
 }
 
 ManualMergeStream.prototype.destroy = function (err) {

@@ -1,0 +1,7 @@
+   y/yes: merge the right diff over the left diff
+      yy: 'y' to the rest of the prompts
+    n/no: ignore the right diff
+      nn: 'n' to the rest of the prompts
+  s/skip: skip this chunk and write neither
+  q/quit: abort, not writing everything
+  ?/help: give more detailed instructions

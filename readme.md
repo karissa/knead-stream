@@ -65,10 +65,4 @@ At each page, the user is presented with a prompt and can enter one of the follo
 
 ### TODO
 Add options:
-  `yy`: yes the rest
-
-  `nn`: no to the rest
-
-  `ss`: skip the rest
-
-
+  change limit in repl (like git's add -p or e/edit)
