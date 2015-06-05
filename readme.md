@@ -13,17 +13,20 @@ var diffs2string = require('diffs-to-string')
 
 var limit = 5
 var batchStream = Batcher(limit)
-var vizFn = function (diff, cb) {
-  cb(changes, diffs2string(diff))
+var opts = {
+  vizFn: function (diff, cb) {
+    cb(changes, diffs2string(diff))
+  }
 }
 
-diffStream.pipe(batchStream).pipe(manualMergeStream(vizFn))
+diffStream.pipe(batchStream).pipe(manualMergeStream(opts))
 ```
 
 The user is presented with a prompt for each page of the stream.
 
 ### Options
 `vizFn` (optional): which viz function to use. uses [diffs-to-string](karissa/diffs-to-string) by default.
+`merge` (optional): if you want to use a custom cli function. mostly used for testing.
 
 Example:
 ```

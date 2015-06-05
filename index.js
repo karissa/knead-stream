@@ -7,15 +7,15 @@ var diffs2string = require('diffs-to-string')
 module.exports = ManualMergeStream
 
 inherits(ManualMergeStream, Transform)
-function ManualMergeStream (vizFn, merge) {
-  if (!(this instanceof ManualMergeStream)) return new ManualMergeStream(vizFn, merge)
+function ManualMergeStream (opts) {
+  if (!(this instanceof ManualMergeStream)) return new ManualMergeStream(opts)
   Transform.call(this, {objectMode: true})
-  debug('merge fn', merge)
+  debug('merge fn', opts.merge)
   this.destroyed = false
-  this.diff2vis = vizFn || function (changes, cb) {
+  this.diff2vis = opts.vizFn || function (changes, cb) {
     cb(changes, diffs2string(changes))
   }
-  this.merge = merge || this.cli
+  this.merge = opts.merge || this.cli
 }
 
 ManualMergeStream.prototype._transform = function (data, enc, next) {
