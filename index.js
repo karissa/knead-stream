@@ -11,6 +11,8 @@ module.exports = ManualMergeStream
 inherits(ManualMergeStream, Transform)
 function ManualMergeStream (opts) {
   if (!(this instanceof ManualMergeStream)) return new ManualMergeStream(opts)
+  if (!opts) opts = {}
+
   Transform.call(this, {objectMode: true})
   debug('merge fn', opts.merge)
   this.destroyed = false
