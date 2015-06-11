@@ -1,6 +1,6 @@
 {
   "name": "manual-merge-stream",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "use user input to merge a sorted-diff-stream",
   "main": "index.js",
   "scripts": {
