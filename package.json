@@ -24,7 +24,7 @@
   "dependencies": {
     "cli-prompt": "^0.4.1",
     "debug": "^2.2.0",
-    "diffs-to-string": "^4.0.1",
+    "diffs-to-string": "^4.0.2",
     "inherits": "^2.0.1"
   },
   "devDependencies": {
