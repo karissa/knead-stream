@@ -16,9 +16,7 @@ function ManualMergeStream (opts) {
   Transform.call(this, {objectMode: true})
   debug('merge fn', opts.merge)
   this.destroyed = false
-  this.diff2vis = opts.vizFn || function (changes, cb) {
-    cb(changes, diffs2string(changes))
-  }
+  this.diff2vis = opts.vizFn || diffs2string
   this.merge = opts.merge || this.cli
   this.stickyBit = false
 }
@@ -26,31 +24,36 @@ function ManualMergeStream (opts) {
 ManualMergeStream.prototype._transform = function (data, enc, next) {
   var self = this
   debug('merge', data)
-  self.diff2vis(data, function (tables, visual) {
-    self.merge(tables, visual, self.push.bind(self), next)
-  })
+  var visual = self.diff2vis(data)
+  self.merge(data, visual, self.push.bind(self), next)
 }
 
-ManualMergeStream.prototype.cli = function (tables, visual, push, next) {
+ManualMergeStream.prototype.cli = function (diff, visual, push, next) {
   var self = this
-  var older = tables[0]
-  var newer = tables[1]
 
-  function pushRow (row) {
-    for (var i = 0; i < row.data.length; i++) {
-      debug('pushing', row.data[i])
-      push(row.data[i])
+  var older = diff.map(function (d) { return d[0] })
+  var newer = diff.map(function (d) { return d[1] })
+
+  debug('older', older)
+  debug('newer', newer)
+
+  function pushPage (page) {
+    debug('pushing page', page)
+
+    for (var i = 0; i < page.length; i++) {
+      debug('pushing', page[i])
+      push(page[i])
     }
   }
 
   function repl () {
     if (self.stickyBit) {
       if (self.stickyBit === 'y') {
-        pushRow(newer)
+        pushPage(newer)
         return next()
       }
       else {
-        pushRow(older)
+        pushPage(older)
         return next()
       }
     }
@@ -66,11 +69,11 @@ ManualMergeStream.prototype.cli = function (tables, visual, push, next) {
     }
 
     if (val === 'y' || val === 'yes') {
-      pushRow(newer)
+      pushPage(newer)
       return next()
     }
     if (val === 'n' || val === 'no') {
-      pushRow(older)
+      pushPage(older)
       return next()
     }
 
